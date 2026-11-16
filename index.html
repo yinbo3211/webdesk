@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-Hans" dir="ltr" data-theme="light" data-form="desktop">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="">
+  <meta name="theme-color" content="#007aff">
+  <meta name="color-scheme" content="light dark">
+  <title>WebDesk</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%23007aff'/%3E%3Crect x='13' y='13' width='17' height='17' rx='5' fill='white'/%3E%3Crect x='34' y='13' width='17' height='17' rx='5' fill='white' opacity='.75'/%3E%3Crect x='13' y='34' width='17' height='17' rx='5' fill='white' opacity='.75'/%3E%3Crect x='34' y='34' width='17' height='17' rx='5' fill='white' opacity='.5'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <a class="skip-link" href="#desk" data-i18n="a11y.skipToContent"></a>
+  <div class="wallpaper" id="wallpaper" aria-hidden="true"></div>
+
+  <div id="app">
+    <header class="topbar" role="banner">
+      <div class="brand">
+        <span class="brand__mark" aria-hidden="true">
+          <svg viewBox="0 0 64 64"><rect x="8" y="8" width="21" height="21" rx="6"/><rect x="35" y="8" width="21" height="21" rx="6"/><rect x="8" y="35" width="21" height="21" rx="6"/><rect x="35" y="35" width="21" height="21" rx="6"/></svg>
+        </span>
+        <div>
+          <div class="brand__name">WebDesk</div>
+          <div class="brand__meta" id="brandMeta"></div>
+        </div>
+      </div>
+      <div class="topbar__spacer"></div>
+      <nav class="topbar__actions" aria-label="">
+        <button class="iconbtn" id="btnSearch" data-i18n-aria="a11y.search" title="">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+        </button>
+        <button class="iconbtn" id="btnLang" data-i18n-aria="a11y.lang" title="" aria-haspopup="dialog">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 3 2.6 15 0 18M12 3c-2.6 3-2.6 15 0 18"/></svg>
+        </button>
+        <button class="iconbtn" id="btnTheme" data-i18n-aria="a11y.theme" title="">
+          <svg viewBox="0 0 24 24" id="themeIcon"><path d="M20 14.5A8.5 8.5 0 019.5 4 8.5 8.5 0 1020 14.5z"/></svg>
+        </button>
+        <button class="iconbtn" id="btnSettings" data-i18n-aria="a11y.settings" title="" aria-haspopup="dialog">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.34 1.88l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.7 1.7 0 00-1.88-.34 1.7 1.7 0 00-1 1.55V21a2 2 0 11-4 0v-.09a1.7 1.7 0 00-1.11-1.55 1.7 1.7 0 00-1.88.34l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.7 1.7 0 004.6 15a1.7 1.7 0 00-1.55-1H3a2 2 0 110-4h.09A1.7 1.7 0 004.6 8.9a1.7 1.7 0 00-.34-1.88l-.06-.06a2 2 0 112.83-2.83l.06.06A1.7 1.7 0 009 4.6a1.7 1.7 0 001-1.55V3a2 2 0 114 0v.09a1.7 1.7 0 001 1.55 1.7 1.7 0 001.88-.34l.06-.06a2 2 0 112.83 2.83l-.06.06A1.7 1.7 0 0019.4 9v0a1.7 1.7 0 001.55 1H21a2 2 0 110 4h-.09a1.7 1.7 0 00-1.51 1z"/></svg>
+        </button>
+        <button class="iconbtn is-primary" id="btnAdd" data-i18n-aria="a11y.add" title="" aria-haspopup="dialog">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </nav>
+    </header>
+
+    <main class="desk" id="desk" tabindex="-1">
+      <div class="desk__viewport" id="viewport">
+        <div class="desk__pages" id="pages"></div>
+      </div>
+      <div class="pager" id="pager" role="tablist" data-i18n-aria="a11y.pageIndicator"></div>
+      <div class="hint" id="hint"></div>
+    </main>
+
+    <div class="dock-wrap">
+      <div class="dock" id="dock" role="navigation" data-i18n-aria="a11y.dock"></div>
+    </div>
+  </div>
+
+  <div class="scrim" id="scrim"></div>
+
+  <!-- add / edit app sheet -->
+  <section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <div class="sheet__grab" aria-hidden="true"></div>
+    <div class="sheet__head">
+      <h2 class="sheet__title" id="sheetTitle"></h2>
+      <button class="sheet__close" id="sheetClose" data-i18n-aria="common.close" aria-label="">&#10005;</button>
+    </div>
+    <form id="appForm" novalidate>
+      <div class="field">
+        <label class="field__label" for="fUrl" data-i18n="sheet.url"></label>
+        <input class="field__input" id="fUrl" type="url" inputmode="url" autocomplete="off" spellcheck="false" data-i18n-placeholder="sheet.url.ph">
+        <div class="field__error" id="fUrlErr" role="alert"></div>
+      </div>
+      <div class="field">
+        <label class="field__label" for="fName" data-i18n="sheet.name"></label>
+        <input class="field__input" id="fName" type="text" maxlength="40" autocomplete="off" data-i18n-placeholder="sheet.name.ph">
+        <div class="field__error" id="fNameErr" role="alert"></div>
+      </div>
+      <div class="field">
+        <span class="field__label" data-i18n="sheet.icon"></span>
+        <div class="segmented" id="iconMode">
+          <button type="button" data-mode="auto" data-i18n="sheet.icon.auto"></button>
+          <button type="button" data-mode="emoji" data-i18n="sheet.icon.emoji"></button>
+          <button type="button" data-mode="upload" data-i18n="sheet.icon.upload"></button>
+        </div>
+        <div id="iconExtra" hidden>
+          <input class="field__input" id="fEmoji" type="text" maxlength="4" data-i18n-placeholder="sheet.icon.emoji.ph" hidden>
+          <div class="emoji-picks" id="emojiPicks"></div>
+          <input type="file" id="fIconFile" accept="image/*" hidden>
+          <div class="field__hint" id="iconHint"></div>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field__label" for="fOpen" data-i18n="sheet.open"></label>
+        <div class="segmented" id="openMode">
+          <button type="button" data-mode="tab" data-i18n="sheet.open.tab"></button>
+          <button type="button" data-mode="layer" data-i18n="sheet.open.layer"></button>
+        </div>
+        <div class="field__hint" id="openHint" data-i18n="sheet.layer.hint"></div>
+      </div>
+      <div class="sheet__actions">
+        <button type="button" class="btn-primary btn-soft" id="sheetCancel" data-i18n="sheet.cancel"></button>
+        <button type="submit" class="btn-primary" id="sheetSave" data-i18n="sheet.save"></button>
+      </div>
+    </form>
+  </section>
+
+  <!-- settings -->
+  <section class="panel" id="settingsPanel" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <div class="panel__head">
+      <h2 class="panel__title" id="settingsTitle" data-i18n="settings.title"></h2>
+      <button class="panel__close" data-close="settingsPanel" data-i18n-aria="common.close" aria-label="">&#10005;</button>
+    </div>
+    <div id="settingsBody"></div>
+  </section>
+
+  <!-- language picker -->
+  <section class="panel" id="langPanel" role="dialog" aria-modal="true" aria-labelledby="langTitle">
+    <div class="panel__head">
+      <h2 class="panel__title" id="langTitle" data-i18n="language.title"></h2>
+      <button class="panel__close" data-close="langPanel" data-i18n-aria="common.close" aria-label="">&#10005;</button>
+    </div>
+    <p class="panel__subtitle" data-i18n="language.subtitle"></p>
+    <div class="lang-list" id="langList"></div>
+  </section>
+
+  <!-- dock editor -->
+  <section class="panel" id="dockPanel" role="dialog" aria-modal="true" aria-labelledby="dockTitle">
+    <div class="panel__head">
+      <h2 class="panel__title" id="dockTitle" data-i18n="editor.dockEdit"></h2>
+      <button class="panel__close" data-close="dockPanel" data-i18n-aria="common.close" aria-label="">&#10005;</button>
+    </div>
+    <p class="panel__subtitle" id="dockHint"></p>
+    <div class="dock-list" id="dockList"></div>
+  </section>
+
+  <!-- search -->
+  <section class="panel" id="searchPanel" role="dialog" aria-modal="true" aria-labelledby="searchTitle">
+    <div class="panel__head">
+      <h2 class="panel__title" id="searchTitle" data-i18n="search.title"></h2>
+      <button class="panel__close" data-close="searchPanel" data-i18n-aria="common.close" aria-label="">&#10005;</button>
+    </div>
+    <input class="search-input" id="searchInput" type="search" autocomplete="off" data-i18n-placeholder="search.ph">
+    <div class="search-results" id="searchResults"></div>
+  </section>
+
+  <!-- help -->
+  <section class="panel" id="helpPanel" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+    <div class="panel__head">
+      <h2 class="panel__title" id="helpTitle" data-i18n="help.title"></h2>
+      <button class="panel__close" data-close="helpPanel" data-i18n-aria="common.close" aria-label="">&#10005;</button>
+    </div>
+    <ol class="help-list" id="helpList"></ol>
+  </section>
+
+  <!-- shortcuts -->
+  <section class="panel" id="shortcutsPanel" role="dialog" aria-modal="true" aria-labelledby="shortcutsTitle">
+    <div class="panel__head">
+      <h2 class="panel__title" id="shortcutsTitle" data-i18n="shortcuts.title"></h2>
+      <button class="panel__close" data-close="shortcutsPanel" data-i18n-aria="common.close" aria-label="">&#10005;</button>
+    </div>
+    <div id="shortcutsBody"></div>
+  </section>
+
+  <!-- generic confirm -->
+  <section class="panel" id="confirmPanel" role="dialog" aria-modal="true" aria-labelledby="confirmTitle" style="width:min(420px,calc(100vw - 32px))">
+    <div class="panel__head">
+      <h2 class="panel__title" id="confirmTitle"></h2>
+      <button class="panel__close" data-close="confirmPanel" data-i18n-aria="common.close" aria-label="">&#10005;</button>
+    </div>
+    <p class="confirm__desc" id="confirmDesc"></p>
+    <input class="confirm__input" id="confirmInput" type="text" autocomplete="off" hidden>
+    <div class="confirm__actions" id="confirmActions"></div>
+  </section>
+
+  <!-- onboarding -->
+  <div class="onboarding" id="onboarding" role="dialog" aria-modal="true" data-i18n-aria="a11y.onboarding">
+    <div class="ob-card">
+      <div class="ob-art" id="obArt" aria-hidden="true"></div>
+      <div class="ob-progress" id="obProgress"></div>
+      <h2 class="ob-title" id="obTitle"></h2>
+      <p class="ob-desc" id="obDesc"></p>
+      <div class="ob-dots" id="obDots"></div>
+      <div class="ob-actions">
+        <button class="btn-primary" id="obNext"></button>
+      </div>
+      <button class="ob-skip" id="obSkip" data-i18n="onboarding.skip"></button>
+    </div>
+  </div>
+
+  <!-- global toast / banner / context menu / app layer -->
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <span id="toastText"></span>
+    <button class="toast__undo" id="toastUndo" data-i18n-aria="a11y.undo" aria-label="" hidden></button>
+  </div>
+  <div class="banner" id="banner" role="status" aria-live="polite">
+    <span id="bannerText"></span>
+    <button id="bannerAction" hidden></button>
+  </div>
+  <div class="ctx" id="ctx" role="menu"></div>
+
+  <div class="layer" id="layer" role="dialog" aria-modal="true">
+    <div class="layer__bar">
+      <button class="iconbtn" id="layerBack" data-i18n-aria="layer.back" title="">
+        <svg class="icon--dir" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
+      </button>
+      <span class="layer__title" id="layerTitle"></span>
+      <button class="iconbtn" id="layerNewTab" data-i18n-aria="layer.newtab" title="">
+        <svg viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5"/></svg>
+      </button>
+      <button class="iconbtn" id="layerClose" data-i18n-aria="layer.close" title="">
+        <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <iframe class="layer__frame" id="layerFrame" title="" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+  </div>
+
+  <input type="file" id="importFile" accept=".json,application/json" hidden>
+
+  <script src="assets/js/locales.generated.js"></script>
+  <script src="assets/js/i18n.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
